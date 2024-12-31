@@ -5,8 +5,9 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        UpdateRoomInfo();
-        GetAllRooms();
+        // UpdateRoomInfo();
+        // GetAllRooms();
+        AddRoom();
     }
 
     static void GetAllRooms()
@@ -97,5 +98,37 @@ internal class Program
 
         context.SaveChanges(); 
         Console.WriteLine("Rummets informationen har uppdaterats.");
+    }
+
+    static void AddRoom()
+    {
+        Console.Write("Ange namn på rummet: ");
+        string name = CHelp.ReadNotEmptyString();
+
+        Console.Write("Ange en beskrivning för rummet: ");
+        string description = CHelp.ReadNotEmptyString();
+
+        Console.Write("Ange rumstypen: ");
+        string roomtype = CHelp.ReadNotEmptyString();
+
+        Console.Write($"Ange antal sängplatser: ");
+        int bedCount = CHelp.ReadInt();
+
+        Console.Write($"Ange priset per natt: ");
+        int price = CHelp.ReadInt();
+
+        var newRoom = new Room
+        {
+            Name = name,
+            Description = description,
+            RoomType = roomtype,
+            BedCount = bedCount,
+            Price = price
+        };
+
+        using var context = new HotelContext();
+        context.Rooms.Add(newRoom);
+        context.SaveChanges();
+        Console.WriteLine($"Rummet har lagts till i databasen och fått id {newRoom.Id}");
     }
 }
