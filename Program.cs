@@ -7,7 +7,8 @@ internal class Program
     {
         // UpdateRoomInfo();
         // GetAllRooms();
-        AddRoom();
+        // AddRoom();
+        DeleteRoom();
     }
 
     static void GetAllRooms()
@@ -130,5 +131,38 @@ internal class Program
         context.Rooms.Add(newRoom);
         context.SaveChanges();
         Console.WriteLine($"Rummet har lagts till i databasen och fått id {newRoom.Id}");
+    }
+
+    static void DeleteRoom()
+    {
+        Console.Write("Ange ID för det rum som du vill ta bort: ");
+        int id = CHelp.ReadInt();
+
+        using var context = new HotelContext();
+
+         Room roomToDelete = context.Rooms.Find(id);
+        if (roomToDelete == null)
+        {
+            Console.WriteLine("Inget rum med angivet ID hittades.");
+            return;
+        }
+
+        Console.WriteLine("Vill du ta bort rummet nedan? Klicka j/n");
+        Console.WriteLine(
+            $"Id: {roomToDelete.Id}\n" +
+            $"Namn: {roomToDelete.Name}\n " +
+            $"Beskrivning: {roomToDelete.Description}\n " +
+            $"Rumstyp: {roomToDelete.RoomType}\n " +
+            $"Antal sängar: {roomToDelete.BedCount}\n " +
+            $"Pris: {roomToDelete.Price} \n \n"
+        );
+
+        string answer = CHelp.ReadNotEmptyString();
+        if (answer.ToLower() == "j")
+        {
+            roomToDelete.IsDeleted = true;
+        }
+        context.SaveChanges();
+        Console.WriteLine("Rummet är nu borttaget");
     }
 }

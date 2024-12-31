@@ -17,5 +17,7 @@ public partial class Room
 
     public int Price { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     public virtual ICollection<RoomToBooking> RoomToBookings { get; set; } = new List<RoomToBooking>();
 }
