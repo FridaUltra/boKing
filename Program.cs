@@ -5,8 +5,8 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        // UpdateRoomInfo();
-        GetAllRooms();
+        UpdateRoomInfo();
+        // GetAllRooms();
         // AddRoom();
         // DeleteRoom();
     }
@@ -40,7 +40,7 @@ internal class Program
 
         // Hämtar rummet från databasen
         Room roomToUpdate = context.Rooms.Find(id);
-        if (roomToUpdate == null)
+        if (roomToUpdate == null || roomToUpdate.IsDeleted == true)
         {
             Console.WriteLine("Inget rum med angivet ID hittades.");
             return;
