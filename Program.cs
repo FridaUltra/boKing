@@ -5,6 +5,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        UpdateRoomInfo();
         GetAllRooms();
     }
 
@@ -28,5 +29,73 @@ internal class Program
             );
         
         }
+    }
+
+    static void UpdateRoomInfo()
+    {
+        // Frågar användaren om studentens ID att uppdatera
+        Console.WriteLine("Ange ID för det rum som du vill uppdatera:");
+        int id = CHelp.ReadInt();
+
+        using var context = new HotelContext();
+
+        // Hämtar rummet från databasen
+        Room roomToUpdate = context.Rooms.Find(id);
+        if (roomToUpdate == null)
+        {
+            Console.WriteLine("Inget rum med angivet ID hittades.");
+            return;
+        }
+        Console.WriteLine($"Nuvarande namn: {roomToUpdate.Name}");
+        Console.WriteLine("Ange nytt namn (lämna tomt för att behålla nuvarande):");
+
+        string newName;
+        if (!string.IsNullOrEmpty(newName = Console.ReadLine()))
+        {
+            roomToUpdate.Name = newName;
+        }
+
+        Console.WriteLine($"Nuvarande beskrivning: {roomToUpdate.Description}\n");
+        Console.WriteLine("Ange ny beskrivning (lämna tomt för att behålla nuvarande):");
+
+        string newDescription;
+        if (!string.IsNullOrEmpty(newDescription = Console.ReadLine()))
+        {
+            roomToUpdate.Description = newDescription;
+        }
+
+        Console.WriteLine($"Nuvarande rumstyp: {roomToUpdate.RoomType}");
+        Console.WriteLine("Ange ny rumstyp (lämna tomt för att behålla nuvarande):");
+
+        string newRoomType;
+        if (!string.IsNullOrEmpty( newRoomType = Console.ReadLine()))
+        {
+            roomToUpdate.RoomType = newRoomType;
+        }
+
+        Console.WriteLine($"Nuvarande antal sängplatser: {roomToUpdate.BedCount}");
+        Console.WriteLine("Ange nytt antal sängplatser (lämna tomt för att behålla nuvarande):");
+
+        string newBedCount;
+        if (!string.IsNullOrEmpty( newBedCount = Console.ReadLine()))
+        {
+            //TODO: kanske göra en try parse här.
+            int bedCountAsInt = int.Parse(newBedCount);
+            roomToUpdate.BedCount = bedCountAsInt;
+        }
+
+        Console.WriteLine($"\nNuvarande pris: {roomToUpdate.Price} kr");
+        Console.WriteLine("Ange nytt pris (lämna tomt för att behålla nuvarande):");
+        string newPrice;
+        if (!string.IsNullOrEmpty( newPrice = Console.ReadLine()))
+        {
+            //TODO: kanske göra en try parse här.
+            int priceAsInt = int.Parse(newPrice);
+            roomToUpdate.Price = priceAsInt;
+        
+        }
+
+        context.SaveChanges(); 
+        Console.WriteLine("Rummets informationen har uppdaterats.");
     }
 }
