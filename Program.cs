@@ -6,19 +6,17 @@ internal class Program
     private static void Main(string[] args)
     {
         // UpdateRoomInfo();
-        // GetAllRooms();
+        GetAllRooms();
         // AddRoom();
-        DeleteRoom();
+        // DeleteRoom();
     }
 
     static void GetAllRooms()
     {
-        // Skapar en instans av HotelContext för att interagera med databasen
-        // Hämta alla rum från databasen som en lista
+        // Hämta alla rum från databasen som inte är raderade
         using var context = new HotelContext();
-        IEnumerable<Room> rooms = context.Rooms;
+        IEnumerable<Room> rooms = context.Rooms.Where(r => r.IsDeleted == false);
 
-        // Itererar över varje rum i listan (som nyss hämtades ur databasen) och skriver ut deras information
         foreach (var room in rooms)
         {
             Console.WriteLine(
@@ -29,7 +27,6 @@ internal class Program
                 $"Antal sängar: {room.BedCount}\n " +
                 $"Pris: {room.Price} \n \n"
             );
-        
         }
     }
 
