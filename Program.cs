@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using boKing;
 using Model;
 
@@ -5,10 +6,12 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        UpdateRoomInfo();
+        // UpdateRoomInfo();
         // GetAllRooms();
         // AddRoom();
         // DeleteRoom();
+        int guestId = AddGuest();
+        Console.WriteLine($"Gäst med id {guestId} har lagts till.");
     }
 
     static void GetAllRooms()
@@ -162,4 +165,30 @@ internal class Program
         context.SaveChanges();
         Console.WriteLine("Rummet är nu borttaget");
     }
+
+    static int AddGuest()
+    {
+        Console.WriteLine("Ange för och efternamn:");
+        string name = CHelp.ReadNotEmptyString();
+
+        Console.WriteLine("Ange gatuadress:");
+        string address = CHelp.ReadNotEmptyString();
+
+        Console.WriteLine("Ange Epost:");
+        string email = CHelp.ReadNotEmptyString();
+
+        Guest newGuest = new()
+        {
+            Name = name,
+            Address = address,
+            Email = email
+        };
+
+        using var context = new HotelContext();
+        context.Guests.Add(newGuest);
+        context.SaveChanges();
+
+        return newGuest.Id;
+    }
+
 }
