@@ -10,8 +10,10 @@ internal class Program
         // GetAllRooms();
         // AddRoom();
         // DeleteRoom();
-        int guestId = AddGuest();
-        Console.WriteLine($"Gäst med id {guestId} har lagts till.");
+        // int guestId = AddGuest();
+        int guestId = 1;
+        // CreateBooking(guestId);
+
     }
 
     static void GetAllRooms()
@@ -191,4 +193,29 @@ internal class Program
         return newGuest.Id;
     }
 
+    static void CreateBooking(int guestId)
+    {
+        Console.WriteLine("Ange antal personer:");
+        var numberOfPeople = CHelp.ReadInt();
+
+        Console.WriteLine("Ange ankomstdatum (yyyy-mm-dd):");
+        var arrivalDate = CHelp.ReadDate();
+
+        Console.WriteLine("Ange avresedatum (yyyy-mm-dd):");
+        var departureDate = CHelp.ReadDate();
+
+        var booking = new Booking
+        {
+            GuestId = guestId,
+            NumberOfPeople = numberOfPeople,
+            ArrivalDate = arrivalDate,
+            DepartureDate = departureDate,
+            BookingNumber = Guid.NewGuid().ToString().Substring(0, 8)
+        };
+
+        using var context = new HotelContext();
+        context.Bookings.Add(booking);
+        Console.WriteLine($"Bokning skapad: BokningsNummer: {booking.BookingNumber}, AnkomstDatum: {booking.ArrivalDate}, Avresedatum: {booking.DepartureDate}");
+        // context.SaveChanges();
+    }
 }

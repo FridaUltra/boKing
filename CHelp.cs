@@ -10,10 +10,10 @@ static class CHelp
         return input;
     }
 
-    public static DateTime ReadDate()
+    public static DateOnly ReadDate()
     {
-        DateTime input;
-        while (!DateTime.TryParse(Console.ReadLine(), out input))
+        DateOnly input;
+        while (!DateOnly.TryParse(Console.ReadLine(), out input))
         {
             Console.WriteLine("Ogiltigt datumformat, försök igen (åååå-mm-dd):");
         }
