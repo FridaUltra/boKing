@@ -11,8 +11,32 @@ internal class Program
         // AddRoom();
         // DeleteRoom();
         // int guestId = AddGuest();
-        int guestId = 1;
+        // int guestId = 1;
         // CreateBooking(guestId);
+        Console.WriteLine("Välkommen till bokningssystemet!");
+
+        while (true)
+        {
+            Console.WriteLine("\nVälj ett alternativ:");
+            Console.WriteLine("1. Lägg till gäst");
+            Console.WriteLine("2. Skapa bokning");
+            switch (choice)
+            {
+                case "1":
+                    Console.WriteLine("\n\n---------------------Lägg till en gäst---------------------------------\n\n");
+                    AddGuest();
+                    break;
+                case "2":
+                Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
+                    CreateBooking();
+                    break;
+                case "0":
+                    return;
+                default:
+                    Console.WriteLine("Ogiltigt val.");
+                    break;
+            }
+        }    
 
     }
 
