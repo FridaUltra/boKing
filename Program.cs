@@ -193,7 +193,7 @@ internal class Program
         return newGuest.Id;
     }
 
-    static void CreateBooking(int guestId)
+    static int CreateBooking(int guestId)
     {
         Console.WriteLine("Ange antal personer:");
         var numberOfPeople = CHelp.ReadInt();
@@ -203,6 +203,18 @@ internal class Program
 
         Console.WriteLine("Ange avresedatum (yyyy-mm-dd):");
         var departureDate = CHelp.ReadDate();
+
+        // Kolla att det finns rum tillgängliga innan bokning sker
+
+        using var context = new HotelContext();
+        bool hasAvailableRooms = context.Rooms
+            .Any(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate));
+
+        if(hasAvailableRooms == false)
+        {
+            Console.WriteLine("Det finns inga rum tillgängliga för det angivna datumintervallet.");
+            return -1;
+        }
 
         var booking = new Booking
         {
@@ -216,6 +228,7 @@ internal class Program
         using var context = new HotelContext();
         context.Bookings.Add(booking);
         Console.WriteLine($"Bokning skapad: BokningsNummer: {booking.BookingNumber}, AnkomstDatum: {booking.ArrivalDate}, Avresedatum: {booking.DepartureDate}");
-        // context.SaveChanges();
+        context.SaveChanges();
+        return booking.Id;
     }
 }
