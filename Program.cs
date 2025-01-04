@@ -168,7 +168,7 @@ internal class Program
         Console.WriteLine("Rummet är nu borttaget");
     }
 
-    static int AddGuest()
+    static void AddGuest()
     {
         Console.WriteLine("Ange för och efternamn:");
         string name = CHelp.ReadNotEmptyString();
@@ -189,12 +189,14 @@ internal class Program
         using var context = new HotelContext();
         context.Guests.Add(newGuest);
         context.SaveChanges();
-
-        return newGuest.Id;
+        Console.WriteLine($"Gästen har lagts till och fått id {newGuest.Id}");
     }
 
-    static int CreateBooking(int guestId)
+    static int CreateBooking()
     {
+        Console.WriteLine("Ange gästens ID:");
+        var guestId = CHelp.ReadInt();
+
         Console.WriteLine("Ange antal personer:");
         var numberOfPeople = CHelp.ReadInt();
 
