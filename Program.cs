@@ -360,4 +360,75 @@ internal class Program
     // Om bara en gäst hittas, returnera den
     return guests[0];
 }
+
+    static void LinkRoomToBooking(Booking booking)
+    {
+        // loop som körs tills man bokat upp så många rum som täcker numberofpeople i bokningen
+        bool done = booking.NumberOfPeople == booking.RoomToBookings.Sum(rtb => rtb.GuestsInRoom);
+        do
+        {
+            var availableRooms = ListAllAvailableRooms(booking.ArrivalDate, booking.DepartureDate);
+            Console.WriteLine("Ange ett rum-ID:");
+            var roomId = CHelp.ReadInt();
+            if(!availableRooms.Any(r => r.Id == roomId))
+            {
+                Console.WriteLine("Ogiltigt rum-ID.");
+                continue;
+            }
+            
+            int index = availableRooms.FindIndex(r => r.Id == roomId);
+            Console.WriteLine("Ange antal gäster i rummet:");
+            var guestsInRoom = CHelp.ReadInt();
+            if (guestsInRoom <= 0)
+            {
+                Console.WriteLine("Antal gäster måste vara minst 1.");
+                continue;
+            }
+            if (guestsInRoom > availableRooms[index].BedCount)
+            {
+                Console.WriteLine("För många gäster för det valda rummet.");
+                continue;
+            }
+         
+            var roomToBooking = new RoomToBooking
+            {
+                RoomId = roomId,
+                BookingId = booking.Id,
+                GuestsInRoom = guestsInRoom,
+                Booking = booking,
+                Room = availableRooms[index]
+            };
+            booking.RoomToBookings.Add(roomToBooking);
+
+            using var context = new HotelContext();
+            context.RoomToBookings.Add(roomToBooking);
+            // context.SaveChanges();
+             done = booking.NumberOfPeople == booking.RoomToBookings.Sum(rtb => rtb.GuestsInRoom);
+        }
+        while (!done);
+    
+    }
+
+    static List<Room> ListAllAvailableRooms(DateOnly arrivalDate, DateOnly departureDate)
+    {
+        // Hämta alla rum som inte är bokade under det angivna datumintervallet
+        using var context = new HotelContext();
+        var availableRooms = context.Rooms
+            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate))
+            .ToList();
+
+        foreach (var room in availableRooms)
+        {
+            Console.WriteLine(
+                $"Id: {room.Id}\n" +
+                $"Namn: {room.Name}\n " +
+                $"Beskrivning: {room.Description}\n " +
+                $"Rumstyp: {room.RoomType}\n " +
+                $"Antal sängar: {room.BedCount}\n " +
+                $"Pris: {room.Price} \n \n"
+            );
+        }
+
+        return availableRooms;
+    }
 }
