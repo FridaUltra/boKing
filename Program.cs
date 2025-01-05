@@ -242,7 +242,7 @@ internal class Program
         Console.WriteLine($"Gästen har lagts till och fått id {newGuest.Id}");
     }
 
-    static int CreateBooking()
+    static Booking? CreateBooking()
     {
         Console.WriteLine("Ange gästens ID:");
         var guestId = CHelp.ReadInt();
@@ -265,7 +265,7 @@ internal class Program
         if(hasAvailableRooms == false)
         {
             Console.WriteLine("Det finns inga rum tillgängliga för det angivna datumintervallet.");
-            return -1;
+            return null;
         }
 
         var booking = new Booking
@@ -277,12 +277,12 @@ internal class Program
             BookingNumber = Guid.NewGuid().ToString().Substring(0, 8)
         };
 
-        using var context = new HotelContext();
         context.Bookings.Add(booking);
         Console.WriteLine($"Bokning skapad: BokningsNummer: {booking.BookingNumber}, AnkomstDatum: {booking.ArrivalDate}, Avresedatum: {booking.DepartureDate}");
         context.SaveChanges();
-        return booking.Id;
+        return booking;
     }
+
     static Guest? SearchGuest()
 {
     Console.WriteLine("1. Sök med namn");
