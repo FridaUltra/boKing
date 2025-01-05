@@ -257,4 +257,81 @@ internal class Program
         context.SaveChanges();
         return booking.Id;
     }
+    static Guest? SearchGuest()
+{
+    Console.WriteLine("1. Sök med namn");
+    Console.WriteLine("2. Sök med e-post");
+    Console.WriteLine("3. Sök med bokningsnummer \n");
+    Console.Write("Välj ett alternativ: ");
+    string choice = Console.ReadLine()!;
+
+    using var context = new HotelContext();
+    IQueryable<Guest> query = context.Guests;
+    
+
+    switch (choice)
+    {
+        case "1":
+            Console.Write("Ange namn: ");
+            string name = CHelp.ReadNotEmptyString();
+            query = query.Where(g => g.Name.Contains(name));
+            break;
+
+        case "2":
+            Console.Write("Ange e-post: ");
+            string email = CHelp.ReadNotEmptyString();
+            query = query.Where(g => g.Email == email);
+            break;
+
+        case "3":
+            Console.Write("Ange bokningsnummer: ");
+            string bookingNr = CHelp.ReadNotEmptyString();
+            
+            var booking = context.Bookings.FirstOrDefault(b => b.BookingNumber == bookingNr);
+            if (booking == null)
+            {
+                Console.WriteLine("Ingen bokning hittades.");
+                return null;
+            }
+            query = query.Where(g => g.Id == booking.GuestId);
+            break;
+
+        default:
+            Console.WriteLine("Ogiltigt val.");
+            return null;
+    }
+
+    // Hämta matchande gäster
+    var guests = query.ToList();
+
+    if (guests.Count == 0)
+    {
+        Console.WriteLine("Ingen gäst hittades.");
+        return null;
+    }
+
+    // Om flera gäster hittas, visa val
+    if (guests.Count > 1)
+    {
+        Console.WriteLine("Flera gäster hittades. Välj en:");
+        for (int i = 0; i < guests.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {guests[i].Name} - {guests[i].Email}");
+        }
+
+        Console.Write("Välj en gäst (ange nummer): ");
+        if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= guests.Count)
+        {
+            return guests[index - 1];
+        }
+        else
+        {
+            Console.WriteLine("Ogiltigt val.");
+            return null;
+        }
+    }
+
+    // Om bara en gäst hittas, returnera den
+    return guests[0];
+}
 }
