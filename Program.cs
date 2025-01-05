@@ -20,6 +20,7 @@ internal class Program
             Console.WriteLine("\nVälj ett alternativ:");
             Console.WriteLine("1. Lägg till gäst");
             Console.WriteLine("2. Skapa bokning");
+            Console.WriteLine("3. Sök efter en gäst");
             switch (choice)
             {
                 case "1":
@@ -29,6 +30,15 @@ internal class Program
                 case "2":
                 Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
                     CreateBooking();
+                    break;
+                case "3":
+                    Console.WriteLine("\n\n---------------------Sök efter gäst---------------------------------\n\n");
+                    var guest = SearchGuest();
+                    if (guest != null)
+                    {
+                        Console.WriteLine("Gäst hittades");
+                        Console.WriteLine($"Id: {guest.Id}, {guest.Name}, {guest.Email}, Adress: {guest.Address}");
+                    }
                     break;
                 case "0":
                     return;
