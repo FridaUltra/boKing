@@ -29,7 +29,11 @@ internal class Program
                     break;
                 case "2":
                 Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
-                    CreateBooking();
+                   var booking = CreateBooking();
+                   if (booking != null)
+                   {
+                        LinkRoomToBooking(booking);
+                   }
                     break;
                 case "3":
                     Console.WriteLine("\n\n---------------------Sök efter gäst---------------------------------\n\n");
