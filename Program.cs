@@ -204,6 +204,22 @@ internal class Program
 
     static void AddGuest()
     {
+        Console.WriteLine("Kontrollerar om gästen redan finns...");
+        var existingGuest = SearchGuest();
+
+        if (existingGuest != null)
+        {
+            Console.WriteLine("Gäst hittades:");
+            Console.WriteLine($"Id: {existingGuest.Id}, {existingGuest.Name}, {existingGuest.Email}");
+            Console.WriteLine("Vill du använda denna gäst? (ja/nej): ");
+            string useExisting = CHelp.ReadNotEmptyString();
+            if (useExisting.ToLower() == "ja")
+            {
+                Console.WriteLine("Existerande gäst valdes.");
+                return;
+            }
+        }
+
         Console.WriteLine("Ange för och efternamn:");
         string name = CHelp.ReadNotEmptyString();
 
