@@ -248,8 +248,17 @@ internal class Program
 
     static Booking? CreateBooking()
     {
+        using var context = new HotelContext();
+
         Console.WriteLine("Ange gästens ID:");
         var guestId = CHelp.ReadInt();
+
+        var guest = context.Guests.Find(guestId);
+        if (guest == null)
+        {
+            Console.WriteLine("Gäst med angivet ID hittades inte.");
+            return null;
+        }
 
         Console.WriteLine("Ange antal personer:");
         var numberOfPeople = CHelp.ReadInt();
@@ -262,7 +271,6 @@ internal class Program
 
         // Kolla att det finns rum tillgängliga innan bokning sker
 
-        using var context = new HotelContext();
         bool hasAvailableRooms = context.Rooms
             .Any(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate));
 
@@ -275,6 +283,7 @@ internal class Program
         var booking = new Booking
         {
             GuestId = guestId,
+            Guest = guest,
             NumberOfPeople = numberOfPeople,
             ArrivalDate = arrivalDate,
             DepartureDate = departureDate,
