@@ -30,10 +30,10 @@ internal class Program
                 case "2":
                 Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
                    var booking = CreateBooking();
-                   if (booking != null)
-                   {
-                        LinkRoomToBooking(booking);
-                   }
+                //    if (booking != null)
+                //    {
+                //         LinkRoomToBooking(booking);
+                //    }
                     break;
                 case "3":
                     Console.WriteLine("\n\n---------------------Sök efter gäst---------------------------------\n\n");
@@ -206,7 +206,7 @@ internal class Program
         Console.WriteLine("Rummet är nu borttaget");
     }
 
-    static void AddGuest()
+    static Guest AddGuest()
     {
         Console.WriteLine("Kontrollerar om gästen redan finns...");
         var existingGuest = SearchGuest();
@@ -220,7 +220,7 @@ internal class Program
             if (useExisting.ToLower() == "ja")
             {
                 Console.WriteLine("Existerande gäst valdes.");
-                return;
+                return existingGuest;
             }
         }
 
@@ -244,21 +244,14 @@ internal class Program
         context.Guests.Add(newGuest);
         context.SaveChanges();
         Console.WriteLine($"Gästen har lagts till och fått id {newGuest.Id}");
+        return newGuest;
     }
 
     static Booking? CreateBooking()
     {
         using var context = new HotelContext();
 
-        Console.WriteLine("Ange gästens ID:");
-        var guestId = CHelp.ReadInt();
-
-        var guest = context.Guests.Find(guestId);
-        if (guest == null)
-        {
-            Console.WriteLine("Gäst med angivet ID hittades inte.");
-            return null;
-        }
+        var guest = AddGuest();
 
         Console.WriteLine("Ange antal personer:");
         var numberOfPeople = CHelp.ReadInt();
@@ -269,30 +262,94 @@ internal class Program
         Console.WriteLine("Ange avresedatum (yyyy-mm-dd):");
         var departureDate = CHelp.ReadDate();
 
-        // Kolla att det finns rum tillgängliga innan bokning sker
+         // Temporär lista för kopplingar mellan rum och bokning
+        var roomToBookings = new List<RoomToBooking>();
 
-        bool hasAvailableRooms = context.Rooms
-            .Any(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate));
-
-        if(hasAvailableRooms == false)
+        // Koppla rum till bokningen
+        bool done = false;
+        do
         {
-            Console.WriteLine("Det finns inga rum tillgängliga för det angivna datumintervallet.");
-            return null;
-        }
+            Console.WriteLine("\n-------------------Tillgängliga rum-------------------\n");
+            var availableRooms = ListAllAvailableRooms(arrivalDate, departureDate);
 
-        var booking = new Booking
+            if (!availableRooms.Any())
+            {
+                Console.WriteLine("Inga tillgängliga rum hittades för det angivna datumintervallet.");
+                return null;
+            }
+
+            Console.WriteLine("Ange ett rum-ID:");
+            var roomId = CHelp.ReadInt();
+            if(!availableRooms.Any(r => r.Id == roomId))
+            {
+                Console.WriteLine("Ogiltigt rum-ID.");
+                continue;
+            }
+
+            Console.WriteLine("Ange antal gäster i rummet:");
+            var guestsInRoom = CHelp.ReadInt();
+
+            var room = availableRooms.First(r => r.Id == roomId);
+            if (guestsInRoom <= 0 || guestsInRoom > room.BedCount)
+            {
+                Console.WriteLine("Ogiltigt antal gäster för detta rum.");
+                continue;
+            }
+
+          
+            roomToBookings.Add(new RoomToBooking
+            {
+                RoomId = room.Id,
+                GuestsInRoom = guestsInRoom
+            });
+
+            Console.WriteLine($"Ett {room.Name} har bokats.");
+
+            var sumOfGuestsInRooms = roomToBookings.Sum(rtb => rtb.GuestsInRoom);
+
+            if (sumOfGuestsInRooms >= numberOfPeople)
+            {
+                done = true;
+            }
+            else
+            {
+                Console.WriteLine($"Du har fördelat {sumOfGuestsInRooms}/{numberOfPeople} gäster. Fortsätt att koppla fler rum.");
+            }
+
+        } while (!done);
+
+        // Skapa bokningen när rum är kopplade
+
+         var booking = new Booking
         {
-            GuestId = guestId,
-            Guest = guest,
+            GuestId = guest.Id,
             NumberOfPeople = numberOfPeople,
             ArrivalDate = arrivalDate,
             DepartureDate = departureDate,
-            BookingNumber = Guid.NewGuid().ToString().Substring(0, 8)
+            BookingNumber = Guid.NewGuid().ToString().Substring(0, 8),
+            TotalPrice = CalculateTotalPrice(roomToBookings),
+            RoomToBookings = roomToBookings
         };
 
         context.Bookings.Add(booking);
-        Console.WriteLine($"Bokning skapad: BokningsNummer: {booking.BookingNumber}, AnkomstDatum: {booking.ArrivalDate}, Avresedatum: {booking.DepartureDate}");
+        
         context.SaveChanges();
+
+        Console.WriteLine("Din bokning är klar.\n");
+        Console.WriteLine($"Bokningsnummer: {booking.BookingNumber} \nAnkomstdatum: {booking.ArrivalDate} \nAvresedatum: {booking.DepartureDate} \nAntal personer: {booking.NumberOfPeople} \nTotalpris: {booking.TotalPrice}");
+
+        foreach (var rtb in booking.RoomToBookings)
+        {
+             
+            var room = context.Rooms.Find(rtb.RoomId);
+            if (room != null)
+            {
+                rtb.Room = room;
+            }
+        
+            Console.WriteLine($"Rum: {rtb.Room.Name}, Antal gäster: {rtb.GuestsInRoom}");
+        }
+
         return booking;
     }
 
@@ -374,53 +431,8 @@ internal class Program
     return guests[0];
 }
 
-    static void LinkRoomToBooking(Booking booking)
-    {
-        // loop som körs tills man bokat upp så många rum som täcker numberofpeople i bokningen
-        bool done = booking.NumberOfPeople == booking.RoomToBookings.Sum(rtb => rtb.GuestsInRoom);
-        do
-        {
-            var availableRooms = ListAllAvailableRooms(booking.ArrivalDate, booking.DepartureDate);
-            Console.WriteLine("Ange ett rum-ID:");
-            var roomId = CHelp.ReadInt();
-            if(!availableRooms.Any(r => r.Id == roomId))
-            {
-                Console.WriteLine("Ogiltigt rum-ID.");
-                continue;
-            }
-            
-            int index = availableRooms.FindIndex(r => r.Id == roomId);
-            Console.WriteLine("Ange antal gäster i rummet:");
-            var guestsInRoom = CHelp.ReadInt();
-            if (guestsInRoom <= 0)
-            {
-                Console.WriteLine("Antal gäster måste vara minst 1.");
-                continue;
-            }
-            if (guestsInRoom > availableRooms[index].BedCount)
-            {
-                Console.WriteLine("För många gäster för det valda rummet.");
-                continue;
-            }
-         
-            var roomToBooking = new RoomToBooking
-            {
-                RoomId = roomId,
-                BookingId = booking.Id,
-                GuestsInRoom = guestsInRoom,
-                Booking = booking,
-                Room = availableRooms[index]
-            };
-            booking.RoomToBookings.Add(roomToBooking);
 
-            using var context = new HotelContext();
-            context.RoomToBookings.Add(roomToBooking);
-            // context.SaveChanges();
-             done = booking.NumberOfPeople == booking.RoomToBookings.Sum(rtb => rtb.GuestsInRoom);
-        }
-        while (!done);
-    
-    }
+   
 
     static List<Room> ListAllAvailableRooms(DateOnly arrivalDate, DateOnly departureDate)
     {
