@@ -16,6 +16,7 @@ internal class Program
             Console.WriteLine("1. Lägg till gäst");
             Console.WriteLine("2. Skapa bokning");
             Console.WriteLine("3. Sök efter en gäst");
+            Console.WriteLine("4. Registrera incheckning");
             switch (choice)
             {
                 case "1":
@@ -38,6 +39,10 @@ internal class Program
                         Console.WriteLine("Gäst hittades");
                         Console.WriteLine($"Id: {guest.Id}, {guest.Name}, {guest.Email}, Adress: {guest.Address}");
                     }
+                    break;
+                case "4":
+                    CheckIn();
+                   
                     break;
                 case "0":
                     return;
@@ -467,5 +472,33 @@ internal class Program
         return totalPrice;
     }
     
+    static void CheckIn()
+    {
+        Console.WriteLine("Ange bokningsnummer:");
+        string bookingNumber = CHelp.ReadNotEmptyString();
+
+        using var context = new HotelContext();
+        // hämtar bokning baserat på bokningsnummer och inkluderar gäst och rumkopplingsinformation
+        var booking = context.Bookings.Include(b => b.Guest).Include(b => b.RoomToBookings).FirstOrDefault(b => b.BookingNumber == bookingNumber);
+        if (booking == null)
+        {
+            Console.WriteLine("Ingen bokning hittades.");
+            return;
+        }
+        Console.WriteLine($"Bokning hittades: {booking.Guest.Name}, {booking.ArrivalDate}, {booking.DepartureDate}");
+        
+        foreach (var rtb in booking.RoomToBookings)
+        {
+            // Hämtar rum från databasen utifrån bokningen
+            var room = context.Rooms.Find(rtb.RoomId);
+            if (room != null)
+            {
+                rtb.Room = room;
+                Console.WriteLine($"Rum: {room.Name}, Antal gäster: {rtb.GuestsInRoom}");
+            }
+        }
+        
+
+    }
 
 }
