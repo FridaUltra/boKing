@@ -6,17 +6,12 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        // UpdateRoomInfo();
-        // GetAllRooms();
-        // AddRoom();
-        // DeleteRoom();
-        // int guestId = AddGuest();
-        // int guestId = 1;
-        // CreateBooking(guestId);
+
         Console.WriteLine("Välkommen till bokningssystemet!");
 
         while (true)
         {
+            Console.WriteLine("\n\n---------------------Huvudmeny---------------------------------\n");
             Console.WriteLine("\nVälj ett alternativ:");
             Console.WriteLine("1. Lägg till gäst");
             Console.WriteLine("2. Skapa bokning");
