@@ -456,4 +456,21 @@ internal class Program
 
         return availableRooms;
     }
+
+    static int CalculateTotalPrice(ICollection<RoomToBooking> roomToBookings)
+    {
+        using var context = new HotelContext();
+        int totalPrice = 0;
+        foreach (var rtb in roomToBookings)
+        {
+            var room = context.Rooms.Find(rtb.RoomId);
+            if (room != null)
+            {
+                totalPrice += room.Price;
+            }
+        }
+        return totalPrice;
+    }
+    
+
 }
