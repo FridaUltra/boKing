@@ -125,6 +125,37 @@ public partial class HotelContext : DbContext
                 .HasConstraintName("FK__RoomToBoo__RoomI__5070F446");
         });
 
+        modelBuilder.Entity<Staff>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Staff__3214EC078F144D9B");
+
+            entity.Property(e => e.Email)
+                .HasMaxLength(64)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(64)
+                .IsUnicode(false);
+            entity.Property(e => e.Role)
+                .HasMaxLength(64)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<CheckInOut>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__CheckInO__3214EC07B1AA9DA4");
+
+            entity.ToTable("CheckInOut");
+
+            entity.HasOne(d => d.CheckInStaff).WithMany(p => p.CheckInOutCheckInStaffs)
+                .HasForeignKey(d => d.CheckInStaffId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__CheckInOu__Check__5AEE82B9");
+
+            entity.HasOne(d => d.CheckOutStaff).WithMany(p => p.CheckInOutCheckOutStaffs)
+                .HasForeignKey(d => d.CheckOutStaffId)
+                .HasConstraintName("FK__CheckInOu__Check__5BE2A6F2");
+        });
+
         OnModelCreatingPartial(modelBuilder);
     }
 
