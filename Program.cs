@@ -482,7 +482,7 @@ internal class Program
             Console.WriteLine("Ingen bokning hittades.");
             return;
         }
-        Console.WriteLine($"Bokning hittades: {booking.Guest.Name}, {booking.ArrivalDate}, {booking.DepartureDate}");
+        Console.WriteLine($"Bokning hittades:\nBokningsnummer: {booking.BookingNumber}\n{booking.Guest.Name}\nAnkomstdatum: {booking.ArrivalDate}\nAvresedatum: {booking.DepartureDate}\nNamn på gäst: {booking.Guest.Name}");
         
         // Om arrivaldate INTE är samma som dagens datum, avbryt incheckning
         if (booking.ArrivalDate != DateOnly.FromDateTime(DateTime.Now))
@@ -501,8 +501,39 @@ internal class Program
                 Console.WriteLine($"Rum: {room.Name}, Antal gäster: {rtb.GuestsInRoom}");
             }
         }
-        
 
+        // loop som kör tills man angett personal som finns registrerad
+        Staff staff = null;
+        int staffId;
+        while (true)
+        {
+            Console.WriteLine("Ange ID för personal som registrerar incheckning:");
+            staffId = CHelp.ReadInt();
+            staff = context.Staff.Find(staffId);
+            if (staff == null)
+            {
+                Console.WriteLine("Ogiltigt personal-ID. Försök igen.");
+                continue;
+            }
+            break;
+        }
+
+        CheckInOut checkIn = new()
+        {
+            BookingId = booking.Id,
+            CheckInDate = DateOnly.FromDateTime(DateTime.Now),
+            CheckInStaffId = staffId
+        };
+
+        context.CheckInOuts.Add(checkIn);
+        context.SaveChanges();
+
+        if (booking.TotalPrice == null)
+        {
+            booking.TotalPrice = CalculateTotalPrice(booking.RoomToBookings);
+        }
+
+        Console.WriteLine("Incheckning registrerad.");
+        Console.WriteLine($"Totalpris: {booking.TotalPrice}");
     }
-
 }
