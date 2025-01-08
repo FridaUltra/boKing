@@ -25,6 +25,10 @@ public partial class HotelContext : DbContext
 
     public virtual DbSet<RoomToBooking> RoomToBookings { get; set; }
 
+    public virtual DbSet<Staff> Staff { get; set; }
+
+    public virtual DbSet<CheckInOut> CheckInOuts { get; set; }
+
     static void LogWithColor(string output)
     {
         Console.ForegroundColor = ConsoleColor.DarkGreen;
