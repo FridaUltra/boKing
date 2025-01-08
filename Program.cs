@@ -484,9 +484,16 @@ internal class Program
         }
         Console.WriteLine($"Bokning hittades: {booking.Guest.Name}, {booking.ArrivalDate}, {booking.DepartureDate}");
         
+        // Om arrivaldate INTE är samma som dagens datum, avbryt incheckning
+        if (booking.ArrivalDate != DateOnly.FromDateTime(DateTime.Now))
+        {
+            Console.WriteLine("Incheckning kan endast registreras på ankomstdagen.");
+            return;
+        }
+        
+        // Hämtar alla rum kopplade till bokningen
         foreach (var rtb in booking.RoomToBookings)
         {
-            // Hämtar rum från databasen utifrån bokningen
             var room = context.Rooms.Find(rtb.RoomId);
             if (room != null)
             {
