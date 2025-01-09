@@ -33,6 +33,12 @@ internal class Program
                     CreateBooking();
                     break;
                 case "2":
+                    Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum---------------------------------\n\n");
+                    Console.WriteLine("Ange startdatum (yyyy-mm-dd):");
+                    var startDate = CHelp.ReadDate();
+                    Console.WriteLine("Ange slutdatum (yyyy-mm-dd):");
+                    var endDate = CHelp.ReadDate();
+                    ShowBookingsForInterval(startDate, endDate);
                     break;
                 case "3":
                     break;
@@ -603,4 +609,34 @@ internal class Program
 
         Console.WriteLine("Utcheckning registrerad!");
     }
+
+    static void ShowBookingsForInterval(DateOnly startDate, DateOnly endDate)
+    {
+        using var context = new HotelContext();
+        var bookings = context.Bookings
+            .Where(b => b.ArrivalDate <= endDate && b.DepartureDate >= startDate)
+            .OrderBy(b => b.ArrivalDate)
+            .Include(b => b.Guest)
+            .Include(b => b.RoomToBookings)
+            .ThenInclude(rtb => rtb.Room)
+            .ToList();
+
+        foreach (var booking in bookings)
+        {
+            Console.WriteLine($"Bokningsnummer: {booking.BookingNumber}");
+            Console.WriteLine($"Gäst: {booking.Guest.Name}");
+            Console.WriteLine($"Ankomstdatum: {booking.ArrivalDate}");
+            Console.WriteLine($"Avresedatum: {booking.DepartureDate}");
+            Console.WriteLine($"Antal personer: {booking.NumberOfPeople}");
+            Console.WriteLine($"Totalpris: {booking.TotalPrice}");
+            Console.WriteLine("Rum kopplade till bokningen:");
+            foreach (var rtb in booking.RoomToBookings)
+            {
+                Console.WriteLine($"-NR {rtb.Room.Id}, {rtb.Room.Name}, Antal sängar: {rtb.Room.BedCount}");
+            }
+            Console.WriteLine();
+        }
+    }
+
 }
+
