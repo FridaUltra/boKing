@@ -204,6 +204,18 @@ internal class Program
             return;
         }
 
+        // Kollar om det finns bokningar kopplade till rummet innan borttagning från dagens datum och framåt
+
+        var bookings = context.RoomToBookings
+            .Include(rtb => rtb.Booking)
+            .Where(rtb => rtb.RoomId == id && rtb.Booking.ArrivalDate >= DateOnly.FromDateTime(DateTime.Now));
+
+        if (bookings.Any())
+        {
+            Console.WriteLine("Det finns bokningar kopplade till rummet. Rummet kan inte tas bort.");
+            return;
+        }    
+        
         Console.WriteLine("Vill du ta bort rummet nedan? Klicka j/n");
         Console.WriteLine(
             $"Id: {roomToDelete.Id}\n" +
