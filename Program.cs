@@ -330,7 +330,7 @@ internal class Program
             ArrivalDate = arrivalDate,
             DepartureDate = departureDate,
             BookingNumber = Guid.NewGuid().ToString().Substring(0, 8),
-            TotalPrice = CalculateTotalPrice(roomToBookings),
+            TotalPrice = CalculateTotalPrice(roomToBookings, (departureDate.ToDateTime(TimeOnly.MinValue) - arrivalDate.ToDateTime(TimeOnly.MinValue)).Days),
             RoomToBookings = roomToBookings
         };
 
@@ -457,7 +457,7 @@ internal class Program
         return availableRooms;
     }
 
-    static int CalculateTotalPrice(ICollection<RoomToBooking> roomToBookings)
+    static int CalculateTotalPrice(ICollection<RoomToBooking> roomToBookings, int numberOfNights)
     {
         using var context = new HotelContext();
         int totalPrice = 0;
@@ -466,7 +466,7 @@ internal class Program
             var room = context.Rooms.Find(rtb.RoomId);
             if (room != null)
             {
-                totalPrice += room.Price;
+                totalPrice += room.Price * numberOfNights;
             }
         }
         return totalPrice;
@@ -533,7 +533,8 @@ internal class Program
 
         if (booking.TotalPrice == null)
         {
-            booking.TotalPrice = CalculateTotalPrice(booking.RoomToBookings);
+            booking.TotalPrice = CalculateTotalPrice(booking.RoomToBookings, booking.NumberOfNights);
+            context.SaveChanges();
         }
 
         Console.WriteLine("Incheckning registrerad.");
