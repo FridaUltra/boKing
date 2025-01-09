@@ -21,7 +21,11 @@ internal class Program
             Console.WriteLine("6. Lista rum");
             Console.WriteLine("7. Lägg till rum");
             Console.WriteLine("8. Uppdatera rum");
+            Console.WriteLine("9. Ta bort rum");
             Console.WriteLine("0. Avsluta");
+            Console.Write("\nDitt val: ");
+            var choice = Console.ReadLine();
+
             switch (choice)
             {
                 case "1":
@@ -60,6 +64,9 @@ internal class Program
                     break;
                 case "8":
                     UpdateRoomInfo();
+                    break;
+                case "9":
+                    DeleteRoom();
                     break;
                 case "0":
                     return;
