@@ -44,6 +44,9 @@ internal class Program
                     CheckIn();
                    
                     break;
+                case "5":
+                    CheckOut();
+                    break;
                 case "0":
                     return;
                 default:
@@ -535,5 +538,49 @@ internal class Program
 
         Console.WriteLine("Incheckning registrerad.");
         Console.WriteLine($"Totalpris: {booking.TotalPrice}");
+    }
+
+    static void CheckOut()
+    {
+        Console.WriteLine("Ange bokningsnummer:");
+        var bookingnumber = CHelp.ReadNotEmptyString();
+
+        using var context = new HotelContext();
+        var booking = context.Bookings
+            .Include(b => b.Guest)
+            .Include(b => b.RoomToBookings)
+            .FirstOrDefault(b => b.BookingNumber == bookingnumber);
+
+        if (booking == null)
+        {
+            Console.WriteLine("Ingen bokning hittades.");
+            return;
+        }    
+
+
+        var checkOut = context.CheckInOuts
+            .FirstOrDefault(c => c.BookingId == booking.Id);
+
+        if (checkOut == null)
+        {
+            Console.WriteLine("Ingen Incheckning hittades.");
+            return;
+        }
+
+        if (checkOut.CheckOutDate != null)
+        {
+            Console.WriteLine("Gästen har redan checkat ut.");
+            return;
+        }
+
+        Console.WriteLine("Ange personal-ID för utcheckning:");
+        var staffId = CHelp.ReadInt();
+        
+        checkOut.CheckOutDate = DateOnly.FromDateTime(DateTime.Now);
+        checkOut.CheckOutStaffId = staffId;
+
+        context.SaveChanges();
+
+        Console.WriteLine("Utcheckning registrerad!");
     }
 }
