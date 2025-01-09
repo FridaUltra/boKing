@@ -13,9 +13,9 @@ internal class Program
         {
             Console.WriteLine("\n\n---------------------Huvudmeny---------------------------------\n");
             Console.WriteLine("\nVälj ett alternativ:");
-            Console.WriteLine("1. Lägg till gäst");
-            Console.WriteLine("2. Skapa bokning");
-            Console.WriteLine("3. Sök efter en gäst");
+            Console.WriteLine("1. Skapa bokning");
+            Console.WriteLine("2. Lista bokningar och visa tillgängliga rum");
+            
             Console.WriteLine("4. Registrera incheckning");
             Console.WriteLine("5. Registrera utcheckning");
             Console.WriteLine("6. Lista rum");
@@ -29,29 +29,15 @@ internal class Program
             switch (choice)
             {
                 case "1":
-                    Console.WriteLine("\n\n---------------------Lägg till en gäst---------------------------------\n\n");
-                    AddGuest();
+                    Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
+                    CreateBooking();
                     break;
                 case "2":
-                Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
-                   var booking = CreateBooking();
-                //    if (booking != null)
-                //    {
-                //         LinkRoomToBooking(booking);
-                //    }
                     break;
                 case "3":
-                    Console.WriteLine("\n\n---------------------Sök efter gäst---------------------------------\n\n");
-                    var guest = SearchGuest();
-                    if (guest != null)
-                    {
-                        Console.WriteLine("Gäst hittades");
-                        Console.WriteLine($"Id: {guest.Id}, {guest.Name}, {guest.Email}, Adress: {guest.Address}");
-                    }
                     break;
                 case "4":
                     CheckIn();
-                   
                     break;
                 case "5":
                     CheckOut();
