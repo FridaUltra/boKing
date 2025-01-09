@@ -19,6 +19,7 @@ internal class Program
             Console.WriteLine("4. Registrera incheckning");
             Console.WriteLine("5. Registrera utcheckning");
             Console.WriteLine("6. Lista rum");
+            Console.WriteLine("7. Lägg till rum");
             switch (choice)
             {
                 case "1":
@@ -51,6 +52,9 @@ internal class Program
                     break;
                 case "6":
                     GetAllRooms();
+                    break;
+                case "7":
+                     AddRoom();
                     break;
                 case "0":
                     return;
