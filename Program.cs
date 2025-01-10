@@ -467,12 +467,12 @@ internal class Program
         return guests[0];
     }
 
-    static List<Room> ListAllAvailableRooms(DateOnly arrivalDate, DateOnly departureDate)
+    static List<Room> ListAllAvailableRooms(DateOnly startDate, DateOnly endDate)
     {
         // Hämta alla rum som är tillgängliga under det angivna datumintervallet
         using var context = new HotelContext();
         var availableRooms = context.Rooms
-            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate))
+            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > endDate || rtb.Booking.DepartureDate < startDate))
             .ToList();
 
         foreach (var room in availableRooms)
