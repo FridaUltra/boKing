@@ -52,7 +52,7 @@ internal class Program
                     GetAllRooms();
                     break;
                 case "7":
-                     AddRoom();
+                    AddRoom();
                     break;
                 case "8":
                     UpdateRoomInfo();
