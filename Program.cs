@@ -35,10 +35,10 @@ internal class Program
                     CreateBooking();
                     break;
                 case "2":
-                    Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum---------------------------------\n\n");
-                    Console.WriteLine("Ange startdatum (yyyy-mm-dd):");
+                    Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum för ett tidsintervall---------------------------------\n\n");
+                    Console.WriteLine("Ange startdatum för intervallet(yyyy-mm-dd):");
                     var startDate = CHelp.ReadDate();
-                    Console.WriteLine("Ange slutdatum (yyyy-mm-dd):");
+                    Console.WriteLine("Ange slutdatum för intervallet (yyyy-mm-dd):");
                     var endDate = CHelp.ReadDate();
                     ShowBookingsForInterval(startDate, endDate);
                     
@@ -49,6 +49,37 @@ internal class Program
                         break;
                     }
                     Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
+                    Console.WriteLine("Vill du se detaljer för ett specifikt rum? (ja/nej)");
+                    string answer = CHelp.ReadNotEmptyString();
+                    if (answer.ToLower() == "ja")
+                    {
+                        Console.WriteLine("Ange rum-NR:");
+                        var roomId = CHelp.ReadInt();
+                        var room = availableRooms.FirstOrDefault(r => r.Id == roomId);
+                        if (room == null)
+                        {
+                            Console.WriteLine("Ogiltigt rum-ID.");
+                            break;
+                        }
+                        Console.WriteLine("---------------------Rumdetaljer---------------------------------\n");
+                        Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}");
+
+                        // Visa recensioner för rummet
+                        using var context = new HotelContext();
+                        var reviews = context.Reviews.Where(r => r.RoomId == roomId);
+                        if (reviews.Any())
+                        {
+                            Console.WriteLine("Recensioner:");
+                            foreach (var review in reviews)
+                            {
+                                Console.WriteLine($"- {review.Name}, Betyg: {review.Rating}, Datum: {review.ReviewDate}, {review.Text}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Inga recensioner hittades.");
+                        }
+                    }
                     break;
                 case "3":
                     AddReview();
