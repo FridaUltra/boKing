@@ -7,9 +7,11 @@ public partial class Review
 {
     public int Id { get; set; }
 
-    public int RoomGuestId { get; set; }
+    public int BookingId { get; set; }
 
     public int RoomId { get; set; }
+
+    public string Name { get; set; } = null!;
 
     public DateOnly ReviewDate { get; set; }
 
@@ -18,5 +20,5 @@ public partial class Review
     public int Rating { get; set; }
 
     public virtual Room Room { get; set; } = null!;
-    public virtual RoomGuest RoomGuest { get; set; } = null!;
+    public virtual Booking Booking { get; set; } = null!;
 }
