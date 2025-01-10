@@ -461,7 +461,7 @@ internal class Program
 
     static List<Room> ListAllAvailableRooms(DateOnly arrivalDate, DateOnly departureDate)
     {
-        // Hämta alla rum som inte är bokade under det angivna datumintervallet
+        // Hämta alla rum som är tillgängliga under det angivna datumintervallet
         using var context = new HotelContext();
         var availableRooms = context.Rooms
             .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > departureDate || rtb.Booking.DepartureDate < arrivalDate))
@@ -470,13 +470,8 @@ internal class Program
         foreach (var room in availableRooms)
         {
             Console.WriteLine(
-                $"Id: {room.Id}\n" +
-                $"Namn: {room.Name}\n " +
-                $"Beskrivning: {room.Description}\n " +
-                $"Rumstyp: {room.RoomType}\n " +
-                $"Antal sängar: {room.BedCount}\n " +
-                $"Pris: {room.Price} \n \n"
-            );
+                $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
+                $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
         }
 
         return availableRooms;
