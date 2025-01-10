@@ -22,6 +22,8 @@ internal class Program
             Console.WriteLine("7. Lägg till rum");
             Console.WriteLine("8. Uppdatera rum");
             Console.WriteLine("9. Ta bort rum");
+            Console.WriteLine("10. Lägg till recension");
+
             Console.WriteLine("0. Avsluta");
             Console.Write("\nDitt val: ");
             var choice = Console.ReadLine();
@@ -49,6 +51,7 @@ internal class Program
                     Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
                     break;
                 case "3":
+                    AddReview();
                     break;
                 case "4":
                     CheckIn();
@@ -68,6 +71,9 @@ internal class Program
                 case "9":
                     DeleteRoom();
                     break;
+                case "10":
+                    AddReview();
+                    break;    
                 case "0":
                     return;
                 default:
@@ -638,6 +644,128 @@ internal class Program
                 Console.WriteLine($"-NR {rtb.Room.Id}, {rtb.Room.Name}, Antal sängar: {rtb.Room.BedCount}");
             }
             Console.WriteLine();
+        }
+    }
+
+    static void AddReview()
+    {
+        Console.WriteLine("Ange bokningsnummer:");
+        var bookingNumber = CHelp.ReadNotEmptyString();
+
+        using var context = new HotelContext();
+        var booking = context.Bookings
+            .Include(b => b.Guest)
+            .Include(b => b.RoomToBookings)
+            .ThenInclude(rtb => rtb.Room)
+            .FirstOrDefault(b => b.BookingNumber == bookingNumber);
+        
+        if (booking == null)
+        {
+            Console.WriteLine("Ingen bokning hittades.");
+            return;
+        }
+
+        // Visa alla rum kopplade till bokningen
+        Console.WriteLine("Välj rum som ska recenseras:");
+        foreach (var rtb in booking.RoomToBookings)
+        {
+            Console.WriteLine($"-NR {rtb.Room.Id}, {rtb.Room.Name}, Typ: {rtb.Room.RoomType}");
+        }
+
+        // Måste välja ett rum att recensera som faktiskt finns i bokningen
+        var roomId = CHelp.ReadInt();
+        var roomToReview = booking.RoomToBookings.FirstOrDefault(rtb => rtb.RoomId == roomId);
+        if (roomToReview == null)
+        {
+            Console.WriteLine("Ogiltigt rum-ID.");
+            return;
+        }
+
+        // Kontrollera antalet reviews lämnade på detta rummet för den bokningen
+        var reviews = context.Reviews.Where(r => r.BookingId == booking.Id && r.RoomId == roomId);
+        if (reviews.Count() == roomToReview.GuestsInRoom)
+        {
+            Console.WriteLine("Rummet har recenserats av alla gäster.");
+            return;
+        }
+
+        // Hämta antalet gäster registrerade i det rummet.
+        var reviewsLeftToGive = roomToReview.GuestsInRoom - reviews.Count();
+        Console.WriteLine($"{roomToReview.GuestsInRoom} st gäster registrerade för detta rum.");
+
+        // Lista för att lagra recensioner
+        List<Review> reviewsList = new();
+
+        while (true)
+        {
+            if(reviewsLeftToGive == 0)
+            {
+                Console.WriteLine("Alla recensioner har lämnats.");
+                break;
+            }
+            else
+            {
+                Console.WriteLine("Recensioner kvar att lämna: " + reviewsLeftToGive);
+            }
+
+
+            Console.WriteLine("Vill du lämna en recension? (ja/nej)");
+            string answer = CHelp.ReadNotEmptyString();
+            if (answer.ToLower() == "nej")
+            {
+                break;
+            }
+            else if (answer.ToLower() != "ja")
+            {
+                Console.WriteLine("Ogiltigt svar.");
+                continue;
+            }
+
+            // Måste ange ett betyg mellan 1-5
+            int rating;
+            do
+            {
+                Console.WriteLine("Ange betyg (1-5):");
+                rating = CHelp.ReadInt();
+                if (rating < 1 || rating > 5)
+                {
+                    Console.WriteLine("Ogiltigt betyg.");
+                } 
+                
+            } while (rating < 1 || rating > 5);
+            
+
+            Console.WriteLine("Ange recension:");
+            var text  = CHelp.ReadNotEmptyString();
+
+            Console.WriteLine("Ange namn på person som recenserar:");
+            var name = CHelp.ReadNotEmptyString();
+
+            // Skapa recensionen
+            var review = new Review
+            {   
+                BookingId = booking.Id,
+                RoomId = roomId,
+                Name = name,
+                ReviewDate = DateOnly.FromDateTime(DateTime.Now),
+                Text = text,
+                Rating = rating
+            };
+
+            reviewsList.Add(review);
+            reviewsLeftToGive--;
+        }
+       
+        context.Reviews.AddRange(reviewsList);
+
+        context.SaveChanges();
+        if(reviewsList.Count == 1)
+        {
+            Console.WriteLine("Recensionen har lagts till.");
+        }
+        else
+        {
+            Console.WriteLine("Recensioner har lagts till.");
         }
     }
 
