@@ -29,6 +29,8 @@ public partial class HotelContext : DbContext
 
     public virtual DbSet<CheckInOut> CheckInOuts { get; set; }
 
+    public virtual DbSet<Review> Reviews { get; set; }
+
     static void LogWithColor(string output)
     {
         Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -158,6 +160,15 @@ public partial class HotelContext : DbContext
             entity.HasOne(d => d.CheckOutStaff).WithMany(p => p.CheckInOutCheckOutStaffs)
                 .HasForeignKey(d => d.CheckOutStaffId)
                 .HasConstraintName("FK__CheckInOu__Check__5BE2A6F2");
+        });
+
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Review__3214EC07184725EF");
+
+            entity.ToTable("Review");
+
+            entity.Property(e => e.Text).HasColumnType("text");
         });
 
         OnModelCreatingPartial(modelBuilder);
