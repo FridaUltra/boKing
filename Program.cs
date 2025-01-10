@@ -65,20 +65,8 @@ internal class Program
                         Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}");
 
                         // Visa recensioner för rummet
-                        using var context = new HotelContext();
-                        var reviews = context.Reviews.Where(r => r.RoomId == roomId);
-                        if (reviews.Any())
-                        {
-                            Console.WriteLine("Recensioner:");
-                            foreach (var review in reviews)
-                            {
-                                Console.WriteLine($"- {review.Name}, Betyg: {review.Rating}, Datum: {review.ReviewDate}, {review.Text}");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Inga recensioner hittades.");
-                        }
+                        ShowReviewsByRoomId(roomId);
+                     
                     }
                     break;
                 case "3":
@@ -798,6 +786,25 @@ internal class Program
         {
             Console.WriteLine("Recensioner har lagts till.");
         }
+    }
+
+    static void ShowReviewsByRoomId(int roomId)
+    {
+        using var context = new HotelContext();
+        var reviews = context.Reviews.Where(r => r.RoomId == roomId);
+        if (reviews.Any())
+        {
+            Console.WriteLine("Recensioner:");
+            foreach (var review in reviews)
+            {
+                Console.WriteLine($"- {review.Name}, Betyg: {review.Rating}, Datum: {review.ReviewDate}, {review.Text}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Inga recensioner hittades.");
+        }
+
     }
 
 }
