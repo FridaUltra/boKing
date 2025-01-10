@@ -39,6 +39,14 @@ internal class Program
                     Console.WriteLine("Ange slutdatum (yyyy-mm-dd):");
                     var endDate = CHelp.ReadDate();
                     ShowBookingsForInterval(startDate, endDate);
+                    
+                    var availableRooms = ListAllAvailableRooms(startDate, endDate);
+                    if (!availableRooms.Any())
+                    {
+                        Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
+                        break;
+                    }
+                    Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
                     break;
                 case "3":
                     break;
