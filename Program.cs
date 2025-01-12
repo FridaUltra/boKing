@@ -414,6 +414,99 @@ internal class Program
         return booking;
     }
 
+    static void CreateBooking2()
+    {
+        using var context = new HotelContext();
+
+        Console.WriteLine("=====Bokningsförmulär=====\n");
+        Console.WriteLine("Ange... \n");
+        Console.Write("Ankomstdatum (yyyy-mm-dd): ");
+        var arrivalDate = CHelp.ReadDate();
+        Console.Write("Avresedatum (yyyy-mm-dd): ");
+        var departureDate = CHelp.ReadDate();
+        Console.Write("Antalet rum: ");
+        var numberOfRooms = CHelp.ReadInt();
+        Console.Write("Antal personer: ");
+        var numberOfPeople = CHelp.ReadInt();
+
+        // Nästa steg är att välja antalet rum som ska bokas.
+        // Tillgängliga rum visas och användaren ska välja vilka rum som ska bokas.
+        // Rummen ska kopplas till bokningen och antalet gäster i varje rum ska anges.
+
+        var availableRooms = GetAllAvailableRoomsForInterval(arrivalDate, departureDate);
+        if (!availableRooms.Any())
+        {
+            Console.WriteLine("Inga rum är tillgängliga för det angivna datumintervallet.");
+            Console.WriteLine("Bokningen avbryts.");
+            Thread.Sleep(2000);
+            return;
+        }
+        //Array som sparar rumId som användaren valt att boka
+        var arrayOfRoomIds = new int[numberOfRooms];
+
+        // Lista som sparar objektet RoomToBooking
+        var roomsToBook = new List<RoomToBooking>();
+        // Loop som körs för varje rum som ska bokas
+        for (int i = 0; i < numberOfRooms; i++)
+        {
+            //Översikt över bokningens val hittills
+            Console.Clear();
+            Console.WriteLine("=====Bokningsformulär=====\n");
+            Console.WriteLine("Ankomstdatum: " + arrivalDate);
+            Console.WriteLine("Avresedatum: " + departureDate);
+            Console.WriteLine("Antal personer: " + numberOfPeople);
+            Console.WriteLine("Antal rum: " + numberOfRooms);
+            Console.WriteLine("Antal rum valda: " + i);
+
+            Console.WriteLine("\n=====Välj rum att boka=====\n");
+            foreach (var room in availableRooms) // Ritar ut alla tillgängliga rum
+            {
+                Console.WriteLine(
+                    $"NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
+                    $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
+            }
+            Console.Write($"\nAnge rum {i + 1}: ");
+            arrayOfRoomIds[i] = CHelp.ReadInt();
+
+            // Kollar om användare valt ett rum som finns i listan över tillgängliga rum
+            var chosenRoom = availableRooms.FirstOrDefault(r => r.Id == arrayOfRoomIds[i]);
+            if (chosenRoom == null)
+            {
+                Console.WriteLine("Ogiltigt rumnummer.");
+                arrayOfRoomIds[i] = 0;
+                i--;
+                continue;
+            }
+            roomsToBook.Add(new RoomToBooking
+            {
+                RoomId = chosenRoom.Id,
+            });
+
+            // tar bort rum från listan över tillgängliga rum
+            availableRooms.RemoveAll(r => r.Id == arrayOfRoomIds[i]);
+        }
+        
+        // Ny översikt över bokningens val hittills
+        Console.Clear();
+        Console.WriteLine("=====Bokningsformulär=====\n");
+        Console.WriteLine("Ankomstdatum: " + arrivalDate);
+        Console.WriteLine("Avresedatum: " + departureDate);
+        Console.WriteLine("Antal personer: " + numberOfPeople);
+        Console.WriteLine("Antal rum: " + numberOfRooms);
+        Console.WriteLine("\n=====Valda rum=====\n");
+        for (int i = 0; i < numberOfRooms; i++)
+        {
+            var room = context.Rooms.Find(arrayOfRoomIds[i]);
+            Console.WriteLine($"Rum {i + 1}: {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price} kr");
+        }
+
+        Console.WriteLine("\n=====Kundformulär=====\n");
+        Console.Write("Namn: ");
+        Console.Write("Adress: ");
+        Console.Write("E-post: ");
+
+    }
+
     static Guest? SearchGuest()
     {
         Console.WriteLine("1. Sök med namn");
