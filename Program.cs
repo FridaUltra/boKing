@@ -11,6 +11,7 @@ internal class Program
 
         while (true)
         {
+            Console.Clear();
             Console.WriteLine("\n\n---------------------Huvudmeny---------------------------------\n");
             Console.WriteLine("\nVälj ett alternativ:");
             Console.WriteLine("1. Skapa bokning");
