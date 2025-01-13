@@ -15,7 +15,7 @@ internal class Program
             Console.WriteLine("\nVälj ett alternativ:");
             Console.WriteLine("1. Skapa bokning");
             Console.WriteLine("2. Lista bokningar och visa tillgängliga rum");
-            
+
             Console.WriteLine("4. Registrera incheckning");
             Console.WriteLine("5. Registrera utcheckning");
             Console.WriteLine("6. Lista rum");
@@ -42,9 +42,10 @@ internal class Program
                     var startDate = CHelp.ReadDate();
                     Console.Write("Ange slutdatum för intervallet (yyyy-mm-dd): ");
                     var endDate = CHelp.ReadDate();
-                    Console.WriteLine("\n==================Bokningar för intervallet==================\n");
 
-                    ShowBookingsForInterval(startDate, endDate);
+                    var bookings = GetBookingsForInterval(startDate, endDate);
+                    Console.WriteLine($"\n==================Bokningar för intervallet ({bookings.Count})==================\n");
+                    PrintBookings(bookings);
                     
                     var availableRooms = GetAllAvailableRoomsForIntervall(startDate, endDate);
                     Console.WriteLine($"\n==================Tillgängliga rum för intervallet ({availableRooms.Count})==================\n");
@@ -367,7 +368,7 @@ internal class Program
 
             Console.WriteLine("\n=====Välj rum att boka=====\n");
             PrintAvailableRooms(availableRooms);
-            
+
             Console.Write($"\nAnge rum {i + 1}: ");
             arrayOfRoomIds[i] = CHelp.ReadInt();
 
@@ -686,7 +687,7 @@ internal class Program
         Console.WriteLine("Utcheckning registrerad!");
     }
 
-    static void ShowBookingsForInterval(DateOnly startDate, DateOnly endDate)
+    static List<Booking> GetBookingsForInterval(DateOnly startDate, DateOnly endDate)
     {
         using var context = new HotelContext();
         var bookings = context.Bookings
@@ -697,6 +698,11 @@ internal class Program
             .ThenInclude(rtb => rtb.Room)
             .ToList();
 
+        return bookings;
+    }
+
+    static void PrintBookings(List<Booking> bookings)
+    {
         foreach (var booking in bookings)
         {
             Console.WriteLine($"Bokningsnummer: {booking.BookingNumber}");
