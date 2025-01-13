@@ -38,13 +38,17 @@ internal class Program
                 case "2":
                     Console.Clear();
                     Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum för ett tidsintervall---------------------------------\n\n");
-                    Console.WriteLine("Ange startdatum för intervallet(yyyy-mm-dd):");
+                    Console.Write("Ange startdatum för intervallet (yyyy-mm-dd): ");
                     var startDate = CHelp.ReadDate();
-                    Console.WriteLine("Ange slutdatum för intervallet (yyyy-mm-dd):");
+                    Console.Write("Ange slutdatum för intervallet (yyyy-mm-dd): ");
                     var endDate = CHelp.ReadDate();
+                    Console.WriteLine("\n==================Bokningar för intervallet==================\n");
+
                     ShowBookingsForInterval(startDate, endDate);
                     
                     var availableRooms = GetAllAvailableRoomsForIntervall(startDate, endDate);
+                    Console.WriteLine($"\n==================Tillgängliga rum för intervallet ({availableRooms.Count})==================\n");
+
                     if (!availableRooms.Any())
                     {
                         Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
@@ -59,7 +63,7 @@ internal class Program
                     }
 
                     Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
-                    Console.WriteLine("Vill du se detaljer för ett specifikt rum? (ja/nej)");
+                    Console.WriteLine("\n\nVill du se detaljer för ett specifikt rum? (ja/nej)");
                     string answer = CHelp.ReadNotEmptyString();
                     if (answer.ToLower() == "ja")
                     {
@@ -72,7 +76,7 @@ internal class Program
                             break;
                         }
                         Console.WriteLine("---------------------Rumdetaljer---------------------------------\n");
-                        Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}");
+                        Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}\nBeskrivning: {room.Description}\n");
 
                         // Visa recensioner för rummet
                         ShowReviewsByRoomId(roomId);
