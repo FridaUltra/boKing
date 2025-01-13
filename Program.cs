@@ -116,6 +116,8 @@ internal class Program
                     CheckOut();
                     break;
                 case "6":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Alla rum---------------------------------\n\n");
                     GetAllRooms();
                     break;
                 case "7":
@@ -157,6 +159,9 @@ internal class Program
                 $"Pris: {room.Price} \n \n"
             );
         }
+
+        Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+        Console.ReadKey();
     }
 
     static void UpdateRoomInfo()
