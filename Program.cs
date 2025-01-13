@@ -558,6 +558,8 @@ internal class Program
             .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > endDate || rtb.Booking.DepartureDate <= startDate))
             .ToList();
 
+        availableRooms.RemoveAll(r => r.IsDeleted == true);    
+
         return availableRooms;
     }
 
