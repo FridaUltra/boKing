@@ -54,13 +54,7 @@ internal class Program
                         Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
                         break;
                     }
-
-                    foreach (var room in availableRooms)
-                    {
-                        Console.WriteLine(
-                        $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
-                        $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
-                    }
+                    PrintAvailableRooms(availableRooms);
 
                     Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
                     Console.WriteLine("\n\nVill du se detaljer för ett specifikt rum? (ja/nej)");
@@ -350,13 +344,8 @@ internal class Program
             Thread.Sleep(2000);
             return;
         }
+        PrintAvailableRooms(availableRooms);
 
-        foreach (var room in availableRooms)
-        {
-            Console.WriteLine(
-            $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
-            $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
-        }
         // Lista som sparar objektet RoomToBooking
         var roomsToBook = new List<RoomToBooking>();
         // Räkna ut antal nätter
@@ -377,12 +366,8 @@ internal class Program
             Console.WriteLine("Antal rum valda: " + i);
 
             Console.WriteLine("\n=====Välj rum att boka=====\n");
-            foreach (var room in availableRooms) // Ritar ut alla tillgängliga rum
-            {
-                Console.WriteLine(
-                    $"NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
-                    $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
-            }
+            PrintAvailableRooms(availableRooms);
+            
             Console.Write($"\nAnge rum {i + 1}: ");
             arrayOfRoomIds[i] = CHelp.ReadInt();
 
@@ -561,6 +546,16 @@ internal class Program
         availableRooms.RemoveAll(r => r.IsDeleted == true);    
 
         return availableRooms;
+    }
+
+    static void PrintAvailableRooms(List<Room> availableRooms)
+    {
+        foreach (var room in availableRooms)
+        {
+            Console.WriteLine(
+            $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
+            $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
+        }
     }
 
     static int CalculateTotalPrice(ICollection<RoomToBooking> roomToBookings, int numberOfNights)
