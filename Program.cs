@@ -36,6 +36,7 @@ internal class Program
                     CreateBooking();
                     break;
                 case "2":
+                    Console.Clear();
                     Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum för ett tidsintervall---------------------------------\n\n");
                     Console.WriteLine("Ange startdatum för intervallet(yyyy-mm-dd):");
                     var startDate = CHelp.ReadDate();
@@ -43,12 +44,20 @@ internal class Program
                     var endDate = CHelp.ReadDate();
                     ShowBookingsForInterval(startDate, endDate);
                     
-                    var availableRooms = ListAllAvailableRooms(startDate, endDate);
+                    var availableRooms = GetAllAvailableRoomsForIntervall(startDate, endDate);
                     if (!availableRooms.Any())
                     {
                         Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
                         break;
                     }
+
+                    foreach (var room in availableRooms)
+                    {
+                        Console.WriteLine(
+                        $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
+                        $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
+                    }
+
                     Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
                     Console.WriteLine("Vill du se detaljer för ett specifikt rum? (ja/nej)");
                     string answer = CHelp.ReadNotEmptyString();
@@ -338,6 +347,12 @@ internal class Program
             return;
         }
 
+        foreach (var room in availableRooms)
+        {
+            Console.WriteLine(
+            $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
+            $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
+        }
         // Lista som sparar objektet RoomToBooking
         var roomsToBook = new List<RoomToBooking>();
         // Räkna ut antal nätter
@@ -531,20 +546,13 @@ internal class Program
         return guests[0];
     }
 
-    static List<Room> ListAllAvailableRooms(DateOnly startDate, DateOnly endDate)
+    static List<Room> GetAllAvailableRoomsForIntervall(DateOnly startDate, DateOnly endDate)
     {
         // Hämta alla rum som är tillgängliga under det angivna datumintervallet
         using var context = new HotelContext();
         var availableRooms = context.Rooms
-            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > endDate || rtb.Booking.DepartureDate < startDate))
+            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > endDate || rtb.Booking.DepartureDate <= startDate))
             .ToList();
-
-        foreach (var room in availableRooms)
-        {
-            Console.WriteLine(
-                $"Rum NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, " +
-                $"Sängar: {room.BedCount}, Pris: {room.Price} kr");
-        }
 
         return availableRooms;
     }
