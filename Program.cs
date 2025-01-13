@@ -14,8 +14,8 @@ internal class Program
             Console.WriteLine("\n\n---------------------Huvudmeny---------------------------------\n");
             Console.WriteLine("\nVälj ett alternativ:");
             Console.WriteLine("1. Skapa bokning");
-            Console.WriteLine("2. Lista bokningar och visa tillgängliga rum");
-
+            Console.WriteLine("2. Lista bokningar för ett tidsintervall");
+            Console.WriteLine("3. Visa tillgängliga rum");
             Console.WriteLine("4. Registrera incheckning");
             Console.WriteLine("5. Registrera utcheckning");
             Console.WriteLine("6. Lista rum");
@@ -37,7 +37,7 @@ internal class Program
                     break;
                 case "2":
                     Console.Clear();
-                    Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum för ett tidsintervall---------------------------------\n\n");
+                    Console.WriteLine("\n\n---------------------Lista bokningar för ett tidsintervall---------------------------------\n\n");
                     Console.Write("Ange startdatum för intervallet (yyyy-mm-dd): ");
                     var startDate = CHelp.ReadDate();
                     Console.Write("Ange slutdatum för intervallet (yyyy-mm-dd): ");
@@ -47,6 +47,16 @@ internal class Program
                     Console.WriteLine($"\n==================Bokningar för intervallet ({bookings.Count})==================\n");
                     PrintBookings(bookings);
                     
+                    break;
+                case "3":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Visa tillgängliga rum för ett intervall---------------------------------\n\n");
+
+                    Console.Write("Ange startdatum för intervallet (yyyy-mm-dd): ");
+                    startDate = CHelp.ReadDate();
+                    Console.Write("Ange slutdatum för intervallet (yyyy-mm-dd): ");
+                    endDate = CHelp.ReadDate();
+
                     var availableRooms = GetAllAvailableRoomsForIntervall(startDate, endDate);
                     Console.WriteLine($"\n==================Tillgängliga rum för intervallet ({availableRooms.Count})==================\n");
 
@@ -70,16 +80,12 @@ internal class Program
                             Console.WriteLine("Ogiltigt rum-ID.");
                             break;
                         }
-                        Console.WriteLine("---------------------Rumdetaljer---------------------------------\n");
+                        Console.WriteLine("===========Rumsdetaljer=========\n");
                         Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}\nBeskrivning: {room.Description}\n");
 
                         // Visa recensioner för rummet
                         ShowReviewsByRoomId(roomId);
-                     
                     }
-                    break;
-                case "3":
-                    AddReview();
                     break;
                 case "4":
                     CheckIn();
