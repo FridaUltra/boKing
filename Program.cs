@@ -121,7 +121,11 @@ internal class Program
                     GetAllRooms();
                     break;
                 case "7":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Lägg till rum---------------------------------\n\n");
                     AddRoom();
+                    Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
                     break;
                 case "8":
                     UpdateRoomInfo();
@@ -261,7 +265,7 @@ internal class Program
         using var context = new HotelContext();
         context.Rooms.Add(newRoom);
         context.SaveChanges();
-        Console.WriteLine($"Rummet har lagts till i databasen och fått id {newRoom.Id}");
+        Console.WriteLine($"\nRummet har lagts till i databasen och fått id {newRoom.Id}");
     }
 
     static void DeleteRoom()
