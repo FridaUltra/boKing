@@ -47,6 +47,9 @@ internal class Program
                     var bookings = GetBookingsForInterval(startDate, endDate);
                     Console.WriteLine($"\n==================Bokningar för intervallet ({bookings.Count})==================\n");
                     PrintBookings(bookings);
+
+                    Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
                     
                     break;
                 case "3":
@@ -59,33 +62,51 @@ internal class Program
                     endDate = CHelp.ReadDate();
 
                     var availableRooms = GetAllAvailableRoomsForIntervall(startDate, endDate);
-                    Console.WriteLine($"\n==================Tillgängliga rum för intervallet ({availableRooms.Count})==================\n");
-
-                    if (!availableRooms.Any())
+                    while (true)
                     {
-                        Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
-                        break;
-                    }
-                    PrintAvailableRooms(availableRooms);
+                        Console.Clear();
+                        Console.WriteLine($"\n==================Tillgängliga rum för intervallet ({availableRooms.Count})==================\n");
+                        Console.WriteLine($"                      {startDate} - {endDate}\n");          
 
-                    Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
-                    Console.WriteLine("\n\nVill du se detaljer för ett specifikt rum? (ja/nej)");
-                    string answer = CHelp.ReadNotEmptyString();
-                    if (answer.ToLower() == "ja")
-                    {
-                        Console.WriteLine("Ange rum-NR:");
-                        var roomId = CHelp.ReadInt();
-                        var room = availableRooms.FirstOrDefault(r => r.Id == roomId);
-                        if (room == null)
+                        if (!availableRooms.Any())
                         {
-                            Console.WriteLine("Ogiltigt rum-ID.");
+                            Console.WriteLine("Inga rum är tillgängliga för det angivna intervallet.");
                             break;
                         }
-                        Console.WriteLine("===========Rumsdetaljer=========\n");
-                        Console.WriteLine($"\n\nRum-NR: {room.Id}, {room.Name}, Typ: {room.RoomType}, Sängar: {room.BedCount}, Pris: {room.Price}\nBeskrivning: {room.Description}\n");
+                        PrintAvailableRooms(availableRooms);
 
-                        // Visa recensioner för rummet
-                        ShowReviewsByRoomId(roomId);
+                        Console.WriteLine("\nAntal tillgängliga rum: " + availableRooms.Count);
+                        Console.WriteLine("\n\nVill du se detaljer för ett specifikt rum? (ja/nej)");
+                        string answer = CHelp.ReadNotEmptyString();
+                        if (answer.ToLower() == "ja")
+                        {
+                            Console.WriteLine("Ange rum-NR:");
+                            var roomId = CHelp.ReadInt();
+                            var room = availableRooms.FirstOrDefault(r => r.Id == roomId);
+                            if (room == null)
+                            {
+                                Console.WriteLine("Ogiltigt rum-ID.");
+                                Thread.Sleep(2000);
+                                continue;
+                            }
+                            Console.Clear();
+                            Console.WriteLine("===============Rumsdetaljer===============\n");
+                            Console.WriteLine($"Rum-NR: {room.Id}" +
+                            $"\n{room.Name} \nTyp: {room.RoomType} \nSängar: {room.BedCount} \nPris: {room.Price}\nBeskrivning: \n\n{room.Description}\n");
+
+                            // Visa recensioner för rummet
+                            ShowReviewsByRoomId(roomId);
+                            Console.ReadLine();
+                        }
+                        else if (answer.ToLower() == "nej")
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ogiltigt val.");
+                            Thread.Sleep(2000);
+                        }
                     }
                     break;
                 case "4":
