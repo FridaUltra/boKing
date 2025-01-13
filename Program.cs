@@ -128,10 +128,18 @@ internal class Program
                     Console.ReadKey();
                     break;
                 case "8":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Uppdatera rum---------------------------------\n\n");
                     UpdateRoomInfo();
+                    Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
                     break;
                 case "9":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Ta bort rum---------------------------------\n\n");
                     DeleteRoom();
+                    Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
                     break;
                 case "10":
                     AddReview();
