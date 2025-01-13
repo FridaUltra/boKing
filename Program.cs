@@ -110,6 +110,8 @@ internal class Program
                     }
                     break;
                 case "4":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Registrera incheckning---------------------------------\n\n");
                     CheckIn();
                     break;
                 case "5":
@@ -621,34 +623,48 @@ internal class Program
     
     static void CheckIn()
     {
-        Console.WriteLine("Ange bokningsnummer:");
+        Console.Write("Ange bokningsnummer: ");
         string bookingNumber = CHelp.ReadNotEmptyString();
 
         using var context = new HotelContext();
         // hämtar bokning baserat på bokningsnummer och inkluderar gäst och rumkopplingsinformation
-        var booking = context.Bookings.Include(b => b.Guest).Include(b => b.RoomToBookings).FirstOrDefault(b => b.BookingNumber == bookingNumber);
+        var booking = context.Bookings.Include(b => b.Guest).Include(b => b.RoomToBookings).ThenInclude(rtb => rtb.Room).FirstOrDefault(b => b.BookingNumber == bookingNumber);
         if (booking == null)
         {
-            Console.WriteLine("Ingen bokning hittades.");
+            Console.WriteLine("\nIngen bokning hittades.");
+            Console.WriteLine("Återgår till huvudmenyn.");
+            Thread.Sleep(2000);
             return;
         }
-        Console.WriteLine($"Bokning hittades:\nBokningsnummer: {booking.BookingNumber}\n{booking.Guest.Name}\nAnkomstdatum: {booking.ArrivalDate}\nAvresedatum: {booking.DepartureDate}\nNamn på gäst: {booking.Guest.Name}");
+        Console.WriteLine($"\nBokning hittades:\nBokningsnummer: {booking.BookingNumber}\nNamn på gäst: {booking.Guest.Name}\nAnkomstdatum: {booking.ArrivalDate}\nAvresedatum: {booking.DepartureDate} \nAntal rum på bokningen: {booking.RoomToBookings.Count} \nAntal personer på bokningen: {booking.NumberOfPeople}");
         
         // Om arrivaldate INTE är samma som dagens datum, avbryt incheckning
         if (booking.ArrivalDate != DateOnly.FromDateTime(DateTime.Now))
         {
-            Console.WriteLine("Incheckning kan endast registreras på ankomstdagen.");
+            Console.WriteLine("\nIncheckning kan endast registreras på ankomstdagen.");
+            Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+            Console.ReadKey();
             return;
         }
-        
-        // Hämtar alla rum kopplade till bokningen
-        foreach (var rtb in booking.RoomToBookings)
+        List<RoomToBooking> roomToBookings = booking.RoomToBookings.ToList();
+        // Hämtar alla rum kopplade till bokningen och ber användaren ange antal gäster i varje rum
+        for (int i = 0; i < booking.RoomToBookings.Count; i++)
         {
-            var room = context.Rooms.Find(rtb.RoomId);
-            if (room != null)
+            Room room = roomToBookings[i].Room;
+            Console.WriteLine($"\nRum NR: {room.Id}, {room.Name}, Sängar: {room.BedCount}");
+            Console.Write("Ange antal gäster i rummet: ");
+            roomToBookings[i].GuestsInRoom = CHelp.ReadInt();
+            if (roomToBookings[i].GuestsInRoom == 0)
             {
-                rtb.Room = room;
-                Console.WriteLine($"Rum: {room.Name}, Antal gäster: {rtb.GuestsInRoom}");
+                Console.WriteLine("Antal gäster måste vara minst 1.");
+                i--;
+                continue;
+            }
+            if (roomToBookings[i].GuestsInRoom > room.BedCount)
+            {
+                Console.WriteLine("Antal gäster får inte överstiga antal sängplatser.");
+                i--;
+                continue;
             }
         }
 
@@ -686,6 +702,7 @@ internal class Program
 
         Console.WriteLine("Incheckning registrerad.");
         Console.WriteLine($"Totalpris: {booking.TotalPrice}");
+        Console.ReadKey();
     }
 
     static void CheckOut()
