@@ -31,8 +31,9 @@ internal class Program
             switch (choice)
             {
                 case "1":
+                    Console.Clear();
                     Console.WriteLine("\n\n---------------------Skapa en bokning---------------------------------\n\n");
-                    CreateBooking2();
+                    CreateBooking();
                     break;
                 case "2":
                     Console.WriteLine("\n\n---------------------Lista bokningar och visa tillgängliga rum för ett tidsintervall---------------------------------\n\n");
@@ -308,7 +309,7 @@ internal class Program
         return newGuest;
     }
 
-    static void CreateBooking2()
+    static void CreateBooking()
     {
         using var context = new HotelContext();
 
