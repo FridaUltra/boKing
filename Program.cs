@@ -115,7 +115,11 @@ internal class Program
                     CheckIn();
                     break;
                 case "5":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Registrera utcheckning---------------------------------\n\n");
                     CheckOut();
+                    Console.WriteLine("Tryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
                     break;
                 case "6":
                     Console.Clear();
