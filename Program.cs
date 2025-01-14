@@ -24,7 +24,7 @@ internal class Program
             Console.WriteLine("8. Uppdatera rum");
             Console.WriteLine("9. Ta bort rum");
             Console.WriteLine("10. Lägg till recension");
-
+            Console.WriteLine("11. Visa recensioner");
             Console.WriteLine("0. Avsluta");
             Console.Write("\nDitt val: ");
             var choice = Console.ReadLine();
@@ -145,7 +145,14 @@ internal class Program
                     break;
                 case "10":
                     AddReview();
-                    break;    
+                    break;
+                case "11":
+                    Console.Clear();
+                    Console.WriteLine("\n\n---------------------Visa alla recensioner---------------------------------\n\n");
+                    ShowAllReviews();
+                    Console.WriteLine("\nTryck på valfri tangent för att återgå till huvudmenyn.");
+                    Console.ReadKey();
+                    break;  
                 case "0":
                     return;
                 default:
@@ -946,5 +953,43 @@ internal class Program
 
     }
 
+    static void ShowAllReviews()
+    {
+        using var context = new HotelContext();
+        var reviews = context.Reviews.Include(r => r.Room).ToList();
+
+        if (reviews.Any())
+        {
+            var groupedReviews = reviews.GroupBy(r => r.RoomId)
+                                        .OrderBy(g => g.Key); // Sortera grupper efter RoomId
+
+            foreach (var group in groupedReviews)
+            {
+                Console.WriteLine($"====================== Rum {group.Key} ===========================");
+                Console.WriteLine($"Antal recensioner: {group.Count()}");
+                Console.WriteLine($"Snittbetyg: {group.Average(r => r.Rating)}\n");
+                foreach (var review in group)
+                {
+                    Console.WriteLine($"- {review.Name}, Betyg: {review.Rating}, Datum: {review.ReviewDate}, {review.Text}");
+                }
+                Console.WriteLine();
+            }
+        }
+        else
+        {
+            Console.WriteLine("Inga recensioner hittades.");
+        }
+    }
+
+    static List<Room> GetAllAvailableRoomsForInterval(DateOnly startDate, DateOnly endDate)
+    {
+        // Hämta alla rum som är tillgängliga under det angivna datumintervallet
+        using var context = new HotelContext();
+        var availableRooms = context.Rooms
+            .Where(r => r.RoomToBookings.All(rtb => rtb.Booking.ArrivalDate > endDate || rtb.Booking.DepartureDate < startDate))
+            .ToList();
+
+        return availableRooms;
+    }
 }
 
