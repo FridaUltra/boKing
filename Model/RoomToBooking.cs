@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Model;
+﻿namespace Model;
 
 public partial class RoomToBooking
 {
@@ -15,5 +12,4 @@ public partial class RoomToBooking
 
     public virtual Room Room { get; set; } = null!;
 
-    public virtual ICollection<RoomGuest> RoomGuests { get; set; } = new List<RoomGuest>();
 }
