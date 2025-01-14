@@ -1,5 +1,5 @@
-using System.Net.Sockets;
 using boKing;
+using Microsoft.EntityFrameworkCore;
 using Model;
 
 internal class Program
@@ -351,14 +351,14 @@ internal class Program
                 return existingGuest;
             }
         }
-
-        Console.WriteLine("Ange för och efternamn:");
+        Console.WriteLine("\nGästen finns inte. Lägg till ny gäst.");
+        Console.Write("\nAnge för och efternamn:");
         string name = CHelp.ReadNotEmptyString();
 
-        Console.WriteLine("Ange gatuadress:");
+        Console.Write("\nAnge gatuadress:");
         string address = CHelp.ReadNotEmptyString();
 
-        Console.WriteLine("Ange Epost:");
+        Console.Write("\nAnge Epost:");
         string email = CHelp.ReadNotEmptyString();
 
         Guest newGuest = new()
@@ -371,7 +371,7 @@ internal class Program
         using var context = new HotelContext();
         context.Guests.Add(newGuest);
         context.SaveChanges();
-        Console.WriteLine($"Gästen har lagts till och fått id {newGuest.Id}");
+        Console.WriteLine($"Gästen har lagts till\n");
         return newGuest;
     }
 
