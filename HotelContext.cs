@@ -41,7 +41,8 @@ public partial class HotelContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         string connectionString = File.ReadAllText("connectionString.txt");
-        optionsBuilder.UseSqlServer(connectionString).EnableSensitiveDataLogging(true).LogTo(LogWithColor, LogLevel.Information);
+        optionsBuilder.UseSqlServer(connectionString);
+        // .EnableSensitiveDataLogging(true).LogTo(LogWithColor, LogLevel.Information);
     }
         
 
